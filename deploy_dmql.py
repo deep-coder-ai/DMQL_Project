@@ -1,35 +1,40 @@
-pip install psycopg2
 import streamlit as st
 import psycopg2
 import pandas as pd
 
-# DB conf
-db_HOST = "127.0.0.1"
-db_NAME = "postgres"
-db_USER = "postgres"
-db_PASS = "@Deep7777"
+def establish_connection():
+    # Database configuration
+    HOST = "127.0.0.1"
+    NAME = "postgres"
+    USER = "postgres"
+    PASS = "@Deep7777"
+    # Establishing connection
+    return psycopg2.connect(dbname=NAME, user=USER, password=PASS, host=HOST)
 
-def get_conn():
-    return psycopg2.connect(dbname=db_NAME, user=db_USER, password=db_PASS, host=db_HOST)
+def execute_query(query, connection):
+    return pd.read_sql_query(query, connection)
 
-def run_query(query):
-    with get_conn() as conn:
-        return pd.read_sql_query(query, conn)
+def get_user_input():
+    st.title('E-Commerce Admin Dashboard')
+    user_query = st.text_area("Enter SQL query here:", height=200)
+    return user_query
+
+def display_results(result):
+    st.write(result)
 
 def main():
-    st.title('E-Commerce Admin Dashboard')
+    user_query = get_user_input()
 
-    query = st.text_area("SQL query goes here:", height=200)
-
-    if st.button("Run"):
-        if query:
+    if st.button("Run Query"):
+        if user_query:
             try:
-                result = run_query(query)
-                st.write(result)
+                with establish_connection() as conn:
+                    query_result = execute_query(user_query, conn)
+                    display_results(query_result)
             except Exception as e:
-                st.error(f"Error running query: {str(e)}")
+                st.error(f"Error executing query: {str(e)}")
         else:
-            st.error("Enter an SQL query for execution.")
+            st.error("Please enter an SQL query.")
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     main()
