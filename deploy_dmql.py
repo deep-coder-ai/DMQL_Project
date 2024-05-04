@@ -2,43 +2,33 @@ import streamlit as st
 import psycopg2
 import pandas as pd
 
-DB_HOST = "127.0.0.1"
-DB_NAME = "postgres"
-DB_USER = "postgres"
-DB_PASS = "@Deep7777"
+# DB conf
+db_HOST = "127.0.0.1"
+db_NAME = "postgres"
+db_USER = "postgres"
+db_PASS = "@Deep7777"
 
-def connect_to_database():
-    return psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+def get_conn():
+    return psycopg2.connect(dbname=db_NAME, user=db_USER, password=db_PASS, host=db_HOST)
 
-def execute_sql_query(sql):
-    with connect_to_database() as connection:
-        return pd.read_sql_query(sql, connection)
+def run_query(query):
+    with get_conn() as conn:
+        return pd.read_sql_query(query, conn)
 
-def run_query_interface():
-    purple_theme = {
-        'base': 'light',
-        'primaryColor': '#9467bd',
-        'backgroundColor': '#f7f4f9',
-        'secondaryBackgroundColor': '#d4b9da',
-        'textColor': '#3f007d',
-        'font': 'sans serif'
-    }
-    st.set_page_config(page_title='Database Query Tool', layout='wide')
-    st.experimental_set_theme(purple_theme)
+def main():
+    st.title('E-Commerce Admin Dashboard')
 
-    st.header('Database Query Tool')
+    query = st.text_area("SQL query goes here:", height=200)
 
-    user_query_text = st.text_area("SQL Query", height=150, placeholder="Write your SQL query here...")
-
-    if st.button("Run Query"):
-        if user_query_text:
+    if st.button("Run"):
+        if query:
             try:
-                query_output = execute_sql_query(user_query_text)
-                st.dataframe(query_output)
-            except Exception as error:
-                st.error(f"Failed to execute query: {error}")
+                result = run_query(query)
+                st.write(result)
+            except Exception as e:
+                st.error(f"Error running query: {str(e)}")
         else:
-            st.error("Enter an SQL query to run.")
+            st.error("Enter an SQL query for execution.")
 
-if __name__ == "__main__":
-    run_query_interface()
+if _name_ == "_main_":
+    main()
