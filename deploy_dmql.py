@@ -2,10 +2,10 @@ import streamlit as st
 import psycopg2
 import pandas as pd
 
-DB_HOST = "localhost"
+DB_HOST = "127.0.0.1"
 DB_NAME = "postgres"
 DB_USER = "postgres"
-DB_PASS = "@hnnr4566"
+DB_PASS = "@Deep7777"
 
 def connect_to_database():
     return psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
