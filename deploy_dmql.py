@@ -1,5 +1,3 @@
-pip install psycopg2
-
 import streamlit as st
 import psycopg2
 import pandas as pd
@@ -42,5 +40,5 @@ def run_query_interface():
         else:
             st.error("Enter an SQL query to run.")
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     run_query_interface()
