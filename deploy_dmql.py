@@ -2,39 +2,34 @@ import streamlit as st
 import psycopg2
 import pandas as pd
 
-def establish_connection():
-    # Database configuration
-    HOST = "127.0.0.1"
-    NAME = "postgres"
-    USER = "postgres"
-    PASS = "@Deep7777"
-    # Establishing connection
-    return psycopg2.connect(dbname=NAME, user=USER, password=PASS, host=HOST)
+# Database connection parameters
+DB_HOST = "127.0.0.1"
+DB_NAME = "postgres"
+DB_USER = "postgres"
+DB_PASS = "@Deep7777"
 
-def execute_query(query, connection):
-    return pd.read_sql_query(query, connection)
+def get_connection():
+    return psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
 
-def get_user_input():
-    st.title('E-Commerce Admin Dashboard')
-    user_query = st.text_area("Enter SQL query here:", height=200)
-    return user_query
-
-def display_results(result):
-    st.write(result)
+def run_query(query):
+    with get_connection() as conn:
+        return pd.read_sql_query(query, conn)
 
 def main():
-    user_query = get_user_input()
+    st.title('SQL Query Interface')
 
-    if st.button("Run Query"):
-        if user_query:
+    # Text area for user to enter SQL query
+    query = st.text_area("Enter your SQL query here:", height=150)
+
+    if st.button("Execute"):
+        if query:
             try:
-                with establish_connection() as conn:
-                    query_result = execute_query(user_query, conn)
-                    display_results(query_result)
+                result = run_query(query)
+                st.write(result)
             except Exception as e:
-                st.error(f"Error executing query: {str(e)}")
+                st.error(f"Error running query: {str(e)}")
         else:
-            st.error("Please enter an SQL query.")
+            st.error("Please enter a SQL query to execute.")
 
 if __name__ == "__main__":
     main()
